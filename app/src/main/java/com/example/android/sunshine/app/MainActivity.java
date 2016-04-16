@@ -20,8 +20,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -55,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean mTwoPane;
     private String mLocation;
+
     private GoogleApiClient mGoogleApiClient;
 
     @Override
@@ -224,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onConnected(Bundle bundle) {
         Log.i(LOG_TAG, "GoogleApiClient connected!");
     }
 
@@ -234,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(LOG_TAG, "GoogleApiClient Connection Failed with result " + connectionResult);
     }
 
@@ -242,5 +241,4 @@ public class MainActivity extends AppCompatActivity implements
     public void onDataChanged(DataEventBuffer dataEventBuffer) {
         Log.i(LOG_TAG, "On Data Changed actually got something!!!");
     }
-
 }

@@ -247,7 +247,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             boolean isAmbient = isInAmbientMode();
-
             mXOffset = bounds.centerX();
 
             // Draw the background.
@@ -309,6 +308,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 x += mMinutePaint.measureText(minuteString);
                 canvas.drawText(amPmString, x, mYOffset, mAmPmPaint);
             }
+        }
+
+        private void drawTime(Canvas canvas, Rect bounds) {
+
         }
 
         /* the watch face became visible or invisible */
