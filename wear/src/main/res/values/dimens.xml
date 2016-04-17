@@ -5,8 +5,8 @@
     <dimen name="date_text_size">15dp</dimen>
     <dimen name="am_pm_size">20dp</dimen>
     <dimen name="am_pm_size_round">25dp</dimen>
-    <dimen name="temp_text_size">15dp</dimen>
-    <dimen name="temp_text_size_round">20dp</dimen>
+    <dimen name="temp_text_size">20dp</dimen>
+    <dimen name="temp_text_size_round">25dp</dimen>
     <dimen name="digital_x_offset">15dp</dimen>
     <dimen name="digital_x_offset_round">25dp</dimen>
     <dimen name="digital_y_offset">70dp</dimen>

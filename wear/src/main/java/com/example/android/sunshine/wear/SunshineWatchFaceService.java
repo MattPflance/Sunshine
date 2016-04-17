@@ -29,6 +29,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -73,6 +75,9 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
     private static final Typeface THIN_TYPEFACE = Typeface.create("sans-serif-thin", Typeface.NORMAL);
 
+    private static final int WEATHER_BITMAP_HEIGHT = 60;
+    private static final int WEATHER_BITMAP_WIDTH = 60;
+
     // Update twice a second to blink colons
     private static final long INTERACTIVE_UPDATE_RATE_MS = 500;
 
@@ -108,6 +113,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         private Paint mMinutePaint;
         private Paint mAmPmPaint;
         private Paint mDatePaint;
+        private Paint mDividerPaint;
         private Paint mHighTempPaint;
         private Paint mLowTempPaint;
         private Bitmap mWeatherBitmap;
@@ -119,6 +125,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         private float mColonWidth;
         private String mAmString;
         private String mPmString;
+        private String mHighString;
+        private String mLowString;
 
         /* the time changed in interactive mode */
         private final Handler mUpdateTimeHandler = new Handler() {
@@ -186,6 +194,9 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             mMinutePaint = createTextPaint(ContextCompat.getColor(context, R.color.white), THIN_TYPEFACE);
             mAmPmPaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
             mDatePaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
+            mDividerPaint = new Paint();
+            mDividerPaint.setStrokeWidth(0.5f);
+            mDividerPaint.setColor(ContextCompat.getColor(context, R.color.primary_light));
             mHighTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
             mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
 
@@ -248,7 +259,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
             boolean isAmbient = isInAmbientMode();
-            mXOffset = bounds.centerX();
+            float centerX = bounds.centerX();
 
             /* TIME */
 
@@ -295,7 +306,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             }
 
             // Center the text
-            float x = mXOffset - (textWidth / 2);
+            float x = centerX - (textWidth / 2);
 
             // Draw text centered
             canvas.drawText(hourString, x, mYOffset, mHourPaint);
@@ -321,62 +332,80 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             date = date.toUpperCase();
 
             float y = mYOffset;
-            x = mXOffset - (mDatePaint.measureText(date) / 2);
+            x = centerX - (mDatePaint.measureText(date) / 2);
             y += mColonPaint.getTextSize();
 
             canvas.drawText(date, x, y, mDatePaint);
+
+            /* Divider */
+
+            y += mDatePaint.getTextSize();
+            x = centerX - (mColonWidth*2);
+
+            canvas.drawLine(x, y, x + (mColonWidth*4), y, mDividerPaint);
+
+            /* Weather */
+            mWeatherBitmap = Bitmap.createScaledBitmap(
+                    BitmapFactory.decodeResource(getResources(), R.drawable.art_clear),
+                    WEATHER_BITMAP_WIDTH,
+                    WEATHER_BITMAP_HEIGHT,
+                    false);
+            mHighString = "99\u00B0";
+            mLowString = "-99\u00B0";
+
+            if (mWeatherBitmap != null && mHighString != null && mLowString != null) {
+
+                y += mDatePaint.getTextSize()*2;
+                float highTempWidth = mHighTempPaint.measureText(mHighString);
+                float lowTempWidth = mLowTempPaint.measureText(mLowString);
+                x = centerX - 30 - mColonWidth - highTempWidth/2 - lowTempWidth/2;
+
+                float bitmapXWidth = WEATHER_BITMAP_WIDTH + mColonWidth;
+                if (!isAmbient) {
+                    canvas.drawBitmap(mWeatherBitmap, x, y-(WEATHER_BITMAP_HEIGHT-20), null);
+                    x += bitmapXWidth;
+                } else {
+                    // Adjust x so the temperatures are centered
+                    x += bitmapXWidth/2;
+                }
+
+                canvas.drawText(mHighString, x, y, mHighTempPaint);
+                x += highTempWidth + mColonWidth;
+
+                canvas.drawText(mLowString, x, y, mLowTempPaint);
+
+            }
 
         }
 
         private String getDayOfWeek(int day) {
             switch(day) {
-                case Calendar.SUNDAY:
-                    return "sun";
-                case Calendar.MONDAY:
-                    return "mon";
-                case Calendar.TUESDAY:
-                    return "tue";
-                case Calendar.WEDNESDAY:
-                    return "wed";
-                case Calendar.THURSDAY:
-                    return "thu";
-                case Calendar.FRIDAY:
-                    return "fri";
-                case Calendar.SATURDAY:
-                    return "sat";
-                default:
-                    return "N/A";
+                case Calendar.SUNDAY: return "sun";
+                case Calendar.MONDAY: return "mon";
+                case Calendar.TUESDAY: return "tue";
+                case Calendar.WEDNESDAY: return "wed";
+                case Calendar.THURSDAY: return "thu";
+                case Calendar.FRIDAY: return "fri";
+                case Calendar.SATURDAY: return "sat";
+                default: return "N/A";
             }
         }
 
         private String getMonth(int month) {
             switch(month) {
-                case Calendar.JANUARY:
-                    return "jan";
-                case Calendar.FEBRUARY:
-                    return "feb";
-                case Calendar.MARCH:
-                    return "mar";
-                case Calendar.APRIL:
-                    return "apr";
-                case Calendar.MAY:
-                    return "may";
-                case Calendar.JUNE:
-                    return "jun";
-                case Calendar.JULY:
-                    return "jul";
-                case Calendar.AUGUST:
-                    return "aug";
-                case Calendar.SEPTEMBER:
-                    return "sep";
-                case Calendar.OCTOBER:
-                    return "oct";
-                case Calendar.NOVEMBER:
-                    return "nov";
-                case Calendar.DECEMBER:
-                    return "dec";
-                default:
-                    return "N/A";
+                case Calendar.JANUARY: return "jan";
+                case Calendar.FEBRUARY: return "feb";
+                case Calendar.MARCH: return "mar";
+                case Calendar.APRIL: return "apr";
+                case Calendar.MAY: return "may";
+                case Calendar.JUNE: return "jun";
+                case Calendar.JULY: return "jul";
+                case Calendar.AUGUST: return "aug";
+                case Calendar.SEPTEMBER: return "sep";
+                case Calendar.OCTOBER: return "oct";
+                case Calendar.NOVEMBER: return "nov";
+                case Calendar.DECEMBER: return "dec";
+                default: return "N/A";
             }
         }
 
@@ -413,6 +442,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
+            mXOffset = resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float timeTextSize = resources.getDimension(isRound ? R.dimen.time_text_size_round : R.dimen.time_text_size);
             float dateTextSize = resources.getDimension(R.dimen.date_text_size);
             float tempTextSize = resources.getDimension(isRound ? R.dimen.temp_text_size_round : R.dimen.temp_text_size);
@@ -501,12 +531,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
             //updateConfigDataItemAndUiOnStartup();
         }
-
         @Override
         public void onConnectionSuspended(int cause) {
             Log.v("WATCH FACE", "GoogleApiClient Connection Suspended!");
         }
-
         @Override
         public void onConnectionFailed(ConnectionResult result) {
             Log.v("WATCH FACE", "GoogleApiClient Connection Failed with result " + result);
@@ -523,16 +551,45 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
                         DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
 
-                        byte[] bytes  = dataMap.getAsset("image").getData();
-                        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        String highTemp = dataMap.getString("high");
-                        String lowTemp = dataMap.getString("low");
+                        mWeatherBitmap = Bitmap.createScaledBitmap(
+                                BitmapFactory.decodeResource(getResources(), getResourceIdFromWeatherId(dataMap.getInt("weather_id"))),
+                                100,
+                                100,
+                                false);
+                        mHighString = dataMap.getString("high");
+                        mLowString = dataMap.getString("low");
 
-                        Log.v("TAG", "TEST TEST TEST TEST");
-
+                        invalidate();
                     }
                 }
             }
+        }
+
+        private int getResourceIdFromWeatherId(int weatherId) {
+            if (weatherId >= 200 && weatherId <= 232) {
+                return R.drawable.art_storm;
+            } else if (weatherId >= 300 && weatherId <= 321) {
+                return R.drawable.art_light_rain;
+            } else if (weatherId >= 500 && weatherId <= 504) {
+                return R.drawable.art_rain;
+            } else if (weatherId == 511) {
+                return R.drawable.art_snow;
+            } else if (weatherId >= 520 && weatherId <= 531) {
+                return R.drawable.art_rain;
+            } else if (weatherId >= 600 && weatherId <= 622) {
+                return R.drawable.art_snow;
+            } else if (weatherId >= 701 && weatherId <= 761) {
+                return R.drawable.art_fog;
+            } else if (weatherId == 761 || weatherId == 781) {
+                return R.drawable.art_storm;
+            } else if (weatherId == 800) {
+                return R.drawable.art_clear;
+            } else if (weatherId == 801) {
+                return R.drawable.art_light_clouds;
+            } else if (weatherId >= 802 && weatherId <= 804) {
+                return R.drawable.art_clouds;
+            }
+            return -1;
         }
     }
 }

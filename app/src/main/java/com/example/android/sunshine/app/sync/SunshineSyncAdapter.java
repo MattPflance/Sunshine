@@ -451,8 +451,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                                     .setContentTitle(title)
                                     .setContentText(contentText);
 
-
-
                     // Probably want to send new data to wearable here
 
                     // Make something interesting happen when the user clicks on the notification.
