@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mattpflance.wear;
+package com.example.android.sunshine.wear;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -57,6 +57,7 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import java.io.InputStream;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -181,10 +182,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             mBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.primary));
 
             mHourPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
-            mColonPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
+            mColonPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
             mMinutePaint = createTextPaint(ContextCompat.getColor(context, R.color.white), THIN_TYPEFACE);
-            mAmPmPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
-            mDatePaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), THIN_TYPEFACE);
+            mAmPmPaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
+            mDatePaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
             mHighTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
             mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
 
@@ -249,6 +250,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             boolean isAmbient = isInAmbientMode();
             mXOffset = bounds.centerX();
 
+            /* TIME */
+
             // Draw the background.
             if (isAmbient) {
                 canvas.drawColor(Color.BLACK);
@@ -308,10 +311,73 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 x += mMinutePaint.measureText(minuteString);
                 canvas.drawText(amPmString, x, mYOffset, mAmPmPaint);
             }
+
+            /* DATE */
+
+            String date = getDayOfWeek(mCalendar.get(Calendar.DAY_OF_WEEK)) + ", " +
+                    getMonth(mCalendar.get(Calendar.MONTH)) + " " +
+                    mCalendar.get(Calendar.DAY_OF_MONTH) + " " +
+                    mCalendar.get(Calendar.YEAR);
+            date = date.toUpperCase();
+
+            float y = mYOffset;
+            x = mXOffset - (mDatePaint.measureText(date) / 2);
+            y += mColonPaint.getTextSize();
+
+            canvas.drawText(date, x, y, mDatePaint);
+
         }
 
-        private void drawTime(Canvas canvas, Rect bounds) {
+        private String getDayOfWeek(int day) {
+            switch(day) {
+                case Calendar.SUNDAY:
+                    return "sun";
+                case Calendar.MONDAY:
+                    return "mon";
+                case Calendar.TUESDAY:
+                    return "tue";
+                case Calendar.WEDNESDAY:
+                    return "wed";
+                case Calendar.THURSDAY:
+                    return "thu";
+                case Calendar.FRIDAY:
+                    return "fri";
+                case Calendar.SATURDAY:
+                    return "sat";
+                default:
+                    return "N/A";
+            }
+        }
 
+        private String getMonth(int month) {
+            switch(month) {
+                case Calendar.JANUARY:
+                    return "jan";
+                case Calendar.FEBRUARY:
+                    return "feb";
+                case Calendar.MARCH:
+                    return "mar";
+                case Calendar.APRIL:
+                    return "apr";
+                case Calendar.MAY:
+                    return "may";
+                case Calendar.JUNE:
+                    return "jun";
+                case Calendar.JULY:
+                    return "jul";
+                case Calendar.AUGUST:
+                    return "aug";
+                case Calendar.SEPTEMBER:
+                    return "sep";
+                case Calendar.OCTOBER:
+                    return "oct";
+                case Calendar.NOVEMBER:
+                    return "nov";
+                case Calendar.DECEMBER:
+                    return "dec";
+                default:
+                    return "N/A";
+            }
         }
 
         /* the watch face became visible or invisible */
@@ -347,13 +413,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
-            float timeTextSize = resources.getDimension(isRound
-                    ? R.dimen.time_text_size_round : R.dimen.time_text_size);
+            float timeTextSize = resources.getDimension(isRound ? R.dimen.time_text_size_round : R.dimen.time_text_size);
             float dateTextSize = resources.getDimension(R.dimen.date_text_size);
-            float tempTextSize = resources.getDimension(isRound
-                    ? R.dimen.temp_text_size_round : R.dimen.temp_text_size);
-            float amPmTextSize = resources.getDimension(isRound
-                    ? R.dimen.am_pm_size_round : R.dimen.am_pm_size);
+            float tempTextSize = resources.getDimension(isRound ? R.dimen.temp_text_size_round : R.dimen.temp_text_size);
+            float amPmTextSize = resources.getDimension(isRound ? R.dimen.am_pm_size_round : R.dimen.am_pm_size);
 
             mHourPaint.setTextSize(timeTextSize);
             mColonPaint.setTextSize(timeTextSize);
@@ -409,8 +472,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
          * @param interactiveColor paint's interactive color
          * @param ambientColor paint's ambient color
          */
-        private void adjustPaintColorToCurrentMode(Paint paint, int interactiveColor,
-                                                   int ambientColor) {
+        private void adjustPaintColorToCurrentMode(Paint paint, int interactiveColor, int ambientColor) {
             paint.setColor(isInAmbientMode() ? ambientColor : interactiveColor);
         }
 
@@ -435,23 +497,24 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onConnected(Bundle connectionHint) {
+            Log.v("WATCH FACE", "GoogleApiClient Connected!");
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
             //updateConfigDataItemAndUiOnStartup();
         }
 
         @Override
         public void onConnectionSuspended(int cause) {
-
+            Log.v("WATCH FACE", "GoogleApiClient Connection Suspended!");
         }
 
         @Override
         public void onConnectionFailed(ConnectionResult result) {
-
+            Log.v("WATCH FACE", "GoogleApiClient Connection Failed with result " + result);
         }
 
         @Override
         public void onDataChanged(DataEventBuffer dataEvents) {
-            Log.v("TAG", "onDataChanged Happened");
+            Log.v("WATCH FACE", "onDataChanged Happened");
             for (DataEvent event : dataEvents) {
                 if (event.getType() == DataEvent.TYPE_CHANGED) {
                     Log.v("TAG", "A Change Actually Happened");
