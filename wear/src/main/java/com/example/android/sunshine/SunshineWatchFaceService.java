@@ -133,6 +133,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         private float mXOffset;
         private float mYOffset;
+        private float mDividerSize;
         private float mColonWidth;
         private String mAmString;
         private String mPmString;
@@ -225,6 +226,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             // Initialize resources
             Resources resources = SunshineWatchFaceService.this.getResources();
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+            mDividerSize = 1f;
             mAmString = "AM";
             mPmString = "PM";
 
@@ -243,7 +245,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             mAmPmPaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
             mDatePaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
             mDividerPaint = new Paint();
-            mDividerPaint.setStrokeWidth(0.5f);
+            mDividerPaint.setStrokeWidth(mDividerSize);
             mDividerPaint.setColor(ContextCompat.getColor(context, R.color.primary_light));
             mHighTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
             mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
@@ -491,6 +493,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             Resources resources = SunshineWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            mDividerSize = isRound ? 1f : 2f;
             float timeTextSize = resources.getDimension(isRound ? R.dimen.time_text_size_round : R.dimen.time_text_size);
             float dateTextSize = resources.getDimension(R.dimen.date_text_size);
             float tempTextSize = resources.getDimension(isRound ? R.dimen.temp_text_size_round : R.dimen.temp_text_size);
