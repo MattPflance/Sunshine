@@ -133,7 +133,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(com.example.android.sunshine.app.R.menu.forecastfragment, menu);
+        inflater.inflate(R.menu.forecastfragment, menu);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //            updateWeather();
 //            return true;
 //        }
-        if (id == com.example.android.sunshine.app.R.id.action_map) {
+        if (id == R.id.action_map) {
             openPreferredLocationInMap();
             return true;
         }
@@ -157,11 +157,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onInflate(Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
         super.onInflate(activity, attrs, savedInstanceState);
-        TypedArray a = activity.obtainStyledAttributes(attrs, com.example.android.sunshine.app.R.styleable.ForecastFragment,
+        TypedArray a = activity.obtainStyledAttributes(attrs, R.styleable.ForecastFragment,
                 0, 0);
-        mChoiceMode = a.getInt(com.example.android.sunshine.app.R.styleable.ForecastFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
-        mAutoSelectView = a.getBoolean(com.example.android.sunshine.app.R.styleable.ForecastFragment_autoSelectView, false);
-        mHoldForTransition = a.getBoolean(com.example.android.sunshine.app.R.styleable.ForecastFragment_sharedElementTransitions, false);
+        mChoiceMode = a.getInt(R.styleable.ForecastFragment_android_choiceMode, AbsListView.CHOICE_MODE_NONE);
+        mAutoSelectView = a.getBoolean(R.styleable.ForecastFragment_autoSelectView, false);
+        mHoldForTransition = a.getBoolean(R.styleable.ForecastFragment_sharedElementTransitions, false);
         a.recycle();
     }
 
@@ -170,14 +170,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
 
 
-        View rootView = inflater.inflate(com.example.android.sunshine.app.R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the RecyclerView, and attach this adapter to it.
-        mRecyclerView = (RecyclerView) rootView.findViewById(com.example.android.sunshine.app.R.id.recyclerview_forecast);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_forecast);
 
         // Set the layout manager
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        View emptyView = rootView.findViewById(com.example.android.sunshine.app.R.id.recyclerview_forecast_empty);
+        View emptyView = rootView.findViewById(R.id.recyclerview_forecast_empty);
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -200,7 +200,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // specify an adapter (see also next example)
         mRecyclerView.setAdapter(mForecastAdapter);
 
-        final View parallaxView = rootView.findViewById(com.example.android.sunshine.app.R.id.parallax_bar);
+        final View parallaxView = rootView.findViewById(R.id.parallax_bar);
         if (null != parallaxView) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
                 mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -219,7 +219,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         }
 
-        final AppBarLayout appbarView = (AppBarLayout)rootView.findViewById(com.example.android.sunshine.app.R.id.appbar);
+        final AppBarLayout appbarView = (AppBarLayout)rootView.findViewById(R.id.appbar);
         if (null != appbarView) {
             ViewCompat.setElevation(appbarView, 0);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -404,24 +404,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
      */
     private void updateEmptyView() {
         if ( mForecastAdapter.getItemCount() == 0 ) {
-            TextView tv = (TextView) getView().findViewById(com.example.android.sunshine.app.R.id.recyclerview_forecast_empty);
+            TextView tv = (TextView) getView().findViewById(R.id.recyclerview_forecast_empty);
             if ( null != tv ) {
                 // if cursor is empty, why? do we have an invalid location
-                int message = com.example.android.sunshine.app.R.string.empty_forecast_list;
+                int message = R.string.empty_forecast_list;
                 @SunshineSyncAdapter.LocationStatus int location = Utility.getLocationStatus(getActivity());
                 switch (location) {
                     case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
-                        message = com.example.android.sunshine.app.R.string.empty_forecast_list_server_down;
+                        message = R.string.empty_forecast_list_server_down;
                         break;
                     case SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID:
-                        message = com.example.android.sunshine.app.R.string.empty_forecast_list_server_error;
+                        message = R.string.empty_forecast_list_server_error;
                         break;
                     case SunshineSyncAdapter.LOCATION_STATUS_INVALID:
-                        message = com.example.android.sunshine.app.R.string.empty_forecast_list_invalid_location;
+                        message = R.string.empty_forecast_list_invalid_location;
                         break;
                     default:
                         if (!Utility.isNetworkAvailable(getActivity())) {
-                            message = com.example.android.sunshine.app.R.string.empty_forecast_list_no_network;
+                            message = R.string.empty_forecast_list_no_network;
                         }
                 }
                 tv.setText(message);
@@ -431,7 +431,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(com.example.android.sunshine.app.R.string.pref_location_status_key))) {
+        if (key.equals(getString(R.string.pref_location_status_key))) {
             updateEmptyView();
         }
     }

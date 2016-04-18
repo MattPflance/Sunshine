@@ -59,11 +59,11 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
         public ForecastAdapterViewHolder(View view) {
             super(view);
-            mIconView = (ImageView) view.findViewById(com.example.android.sunshine.app.R.id.list_item_icon);
-            mDateView = (TextView) view.findViewById(com.example.android.sunshine.app.R.id.list_item_date_textview);
-            mDescriptionView = (TextView) view.findViewById(com.example.android.sunshine.app.R.id.list_item_forecast_textview);
-            mHighTempView = (TextView) view.findViewById(com.example.android.sunshine.app.R.id.list_item_high_textview);
-            mLowTempView = (TextView) view.findViewById(com.example.android.sunshine.app.R.id.list_item_low_textview);
+            mIconView = (ImageView) view.findViewById(R.id.list_item_icon);
+            mDateView = (TextView) view.findViewById(R.id.list_item_date_textview);
+            mDescriptionView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+            mHighTempView = (TextView) view.findViewById(R.id.list_item_high_textview);
+            mLowTempView = (TextView) view.findViewById(R.id.list_item_low_textview);
             view.setOnClickListener(this);
         }
 
@@ -103,11 +103,11 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
             int layoutId = -1;
             switch (viewType) {
                 case VIEW_TYPE_TODAY: {
-                    layoutId = com.example.android.sunshine.app.R.layout.list_item_forecast_today;
+                    layoutId = R.layout.list_item_forecast_today;
                     break;
                 }
                 case VIEW_TYPE_FUTURE_DAY: {
-                    layoutId = com.example.android.sunshine.app.R.layout.list_item_forecast;
+                    layoutId = R.layout.list_item_forecast;
                     break;
                 }
             }
@@ -161,7 +161,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
         // Find TextView and set weather forecast on it
         forecastAdapterViewHolder.mDescriptionView.setText(description);
-        forecastAdapterViewHolder.mDescriptionView.setContentDescription(mContext.getString(com.example.android.sunshine.app.R.string.a11y_forecast, description));
+        forecastAdapterViewHolder.mDescriptionView.setContentDescription(mContext.getString(R.string.a11y_forecast, description));
 
         // For accessibility, we don't want a content description for the icon field
         // because the information is repeated in the description view and the icon
@@ -171,13 +171,13 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
         double high = mCursor.getDouble(ForecastFragment.COL_WEATHER_MAX_TEMP);
         String highString = Utility.formatTemperature(mContext, high);
         forecastAdapterViewHolder.mHighTempView.setText(highString);
-        forecastAdapterViewHolder.mHighTempView.setContentDescription(mContext.getString(com.example.android.sunshine.app.R.string.a11y_high_temp, highString));
+        forecastAdapterViewHolder.mHighTempView.setContentDescription(mContext.getString(R.string.a11y_high_temp, highString));
 
         // Read low temperature from cursor
         double low = mCursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
         String lowString = Utility.formatTemperature(mContext, low);
         forecastAdapterViewHolder.mLowTempView.setText(lowString);
-        forecastAdapterViewHolder.mLowTempView.setContentDescription(mContext.getString(com.example.android.sunshine.app.R.string.a11y_low_temp, lowString));
+        forecastAdapterViewHolder.mLowTempView.setContentDescription(mContext.getString(R.string.a11y_low_temp, lowString));
 
         mICM.onBindViewHolder(forecastAdapterViewHolder, position);
     }

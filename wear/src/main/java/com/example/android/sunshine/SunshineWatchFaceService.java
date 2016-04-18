@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,6 +44,7 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
@@ -160,30 +162,22 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             public void handleMessage(Message message) {
                 switch (message.what) {
                     case MSG_UPDATE_WEATHER:
+                        long timeMs = System.currentTimeMillis();
+                        long delayMs = DAY_IN_MILLIS - (timeMs % DAY_IN_MILLIS);
 
-                        new Thread(new Runnable() {
+                        //Log.v("WATCH FACE", "Delay: " + delayMs);
+
+                        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_REQUEST_PATH);
+                        putDataMapRequest.getDataMap().putLong("Time", timeMs);
+                        putDataMapRequest.setUrgent();
+                        PutDataRequest request = putDataMapRequest.asPutDataRequest();
+                        Wearable.DataApi.putDataItem(mGoogleApiClient, request).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
                             @Override
-                            public void run() {
-                                long timeMs = System.currentTimeMillis();
-                                long delayMs = DAY_IN_MILLIS - timeMs;
-                                // Send a DataItem to app that tells them we want data
-                                NodeApi.GetConnectedNodesResult nodes = Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
-                                List<Node> nodesList = nodes.getNodes();
-                                String nodeId = null;
-                                if (nodesList.size() > 0) nodeId = nodesList.get(0).getId();
-
-                                Log.v("SENDING MESSAGE", "Node ID: " + nodeId);
-
-                                Wearable.MessageApi.sendMessage(mGoogleApiClient, nodeId, WEATHER_REQUEST_PATH, new byte[0])
-                                        .setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
-                                            @Override
-                                            public void onResult(@NonNull MessageApi.SendMessageResult sendMessageResult) {
-                                                Log.v("WATCH FACE", "The message status: " + sendMessageResult.getStatus());
-                                            }
-                                        });
-                                mUpdateWeatherHandler.sendEmptyMessageDelayed(MSG_UPDATE_WEATHER, delayMs);
+                            public void onResult(final DataApi.DataItemResult result) {
+                                //Log.d("WATCH_FACE", "Data item status: " + result.getStatus());
                             }
-                        }).start();
+                        });
+                        mUpdateWeatherHandler.sendEmptyMessageDelayed(MSG_UPDATE_WEATHER, delayMs);
                         break;
                 }
             }
@@ -230,25 +224,29 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
             // Initialize resources
             Resources resources = SunshineWatchFaceService.this.getResources();
-            mYOffset = resources.getDimension(com.example.android.sunshine.wear.R.dimen.digital_y_offset);
+            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mAmString = "AM";
             mPmString = "PM";
+
+            mWeatherBitmap = null;
+            mHighString = "";
+            mLowString = "";
 
             Context context = SunshineWatchFaceService.this;
 
             mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.primary));
+            mBackgroundPaint.setColor(ContextCompat.getColor(context, R.color.primary));
 
-            mHourPaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.white), NORMAL_TYPEFACE);
-            mColonPaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.white), NORMAL_TYPEFACE);
-            mMinutePaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.white), THIN_TYPEFACE);
-            mAmPmPaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.primary_light), NORMAL_TYPEFACE);
-            mDatePaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.primary_light), NORMAL_TYPEFACE);
+            mHourPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
+            mColonPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
+            mMinutePaint = createTextPaint(ContextCompat.getColor(context, R.color.white), THIN_TYPEFACE);
+            mAmPmPaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
+            mDatePaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
             mDividerPaint = new Paint();
             mDividerPaint.setStrokeWidth(0.5f);
-            mDividerPaint.setColor(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.primary_light));
-            mHighTempPaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.white), NORMAL_TYPEFACE);
-            mLowTempPaint = createTextPaint(ContextCompat.getColor(context, com.example.android.sunshine.wear.R.color.forecast_low_text), NORMAL_TYPEFACE);
+            mDividerPaint.setColor(ContextCompat.getColor(context, R.color.primary_light));
+            mHighTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
+            mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
 
             //mWeatherBitmap;          // Colored or Gray icon
 
@@ -492,11 +490,11 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound ? com.example.android.sunshine.wear.R.dimen.digital_x_offset_round : com.example.android.sunshine.wear.R.dimen.digital_x_offset);
-            float timeTextSize = resources.getDimension(isRound ? com.example.android.sunshine.wear.R.dimen.time_text_size_round : com.example.android.sunshine.wear.R.dimen.time_text_size);
-            float dateTextSize = resources.getDimension(com.example.android.sunshine.wear.R.dimen.date_text_size);
-            float tempTextSize = resources.getDimension(isRound ? com.example.android.sunshine.wear.R.dimen.temp_text_size_round : com.example.android.sunshine.wear.R.dimen.temp_text_size);
-            float amPmTextSize = resources.getDimension(isRound ? com.example.android.sunshine.wear.R.dimen.am_pm_size_round : com.example.android.sunshine.wear.R.dimen.am_pm_size);
+            mXOffset = resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            float timeTextSize = resources.getDimension(isRound ? R.dimen.time_text_size_round : R.dimen.time_text_size);
+            float dateTextSize = resources.getDimension(R.dimen.date_text_size);
+            float tempTextSize = resources.getDimension(isRound ? R.dimen.temp_text_size_round : R.dimen.temp_text_size);
+            float amPmTextSize = resources.getDimension(isRound ? R.dimen.am_pm_size_round : R.dimen.am_pm_size);
 
             mHourPaint.setTextSize(timeTextSize);
             mColonPaint.setTextSize(timeTextSize);
@@ -565,10 +563,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             if (shouldTimerBeRunning()) {
                 mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
             }
-
-            if (!mUpdateWeatherHandler.hasMessages(MSG_UPDATE_WEATHER)) {
-                mUpdateWeatherHandler.sendEmptyMessage(MSG_UPDATE_WEATHER);
-            }
         }
 
         /**
@@ -581,65 +575,66 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onConnected(Bundle connectionHint) {
-            Log.v("WATCH FACE", "GoogleApiClient Connected!");
+            Log.i("WATCH FACE", "GoogleApiClient Connected!");
             Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-            //updateConfigDataItemAndUiOnStartup();
+            mUpdateWeatherHandler.sendEmptyMessage(MSG_UPDATE_WEATHER);
         }
         @Override
         public void onConnectionSuspended(int cause) {
-            Log.v("WATCH FACE", "GoogleApiClient Connection Suspended!");
+            Log.e("WATCH FACE", "GoogleApiClient Connection Suspended!");
         }
         @Override
         public void onConnectionFailed(ConnectionResult result) {
-            Log.v("WATCH FACE", "GoogleApiClient Connection Failed with result " + result);
+            Log.e("WATCH FACE", "GoogleApiClient Connection Failed with result " + result);
         }
 
         @Override
         public void onDataChanged(DataEventBuffer dataEvents) {
             for (DataEvent event : dataEvents) {
-                if (event.getType() == DataEvent.TYPE_CHANGED) {
-                    String path = event.getDataItem().getUri().getPath();
-                    if (WEATHER_PATH.equals(path)) {
+                String path = event.getDataItem().getUri().getPath();
+                //Log.v("WATCH FACE", "Path: " + path);
+                if (WEATHER_PATH.equals(path)) {
 
-                        DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
+                    DataMap dataMap = DataMapItem.fromDataItem(event.getDataItem()).getDataMap();
 
-                        mWeatherBitmap = Bitmap.createScaledBitmap(
-                                BitmapFactory.decodeResource(getResources(), getResourceIdFromWeatherId(dataMap.getInt(WEATHER_ID_KEY))),
-                                WEATHER_BITMAP_WIDTH,
-                                WEATHER_BITMAP_HEIGHT,
-                                false);
-                        mHighString = dataMap.getString(HIGH_TEMP_KEY);
-                        mLowString = dataMap.getString(LOW_TEMP_KEY);
+                    mWeatherBitmap = Bitmap.createScaledBitmap(
+                            BitmapFactory.decodeResource(getResources(), getResourceIdFromWeatherId(dataMap.getInt(WEATHER_ID_KEY))),
+                            WEATHER_BITMAP_WIDTH,
+                            WEATHER_BITMAP_HEIGHT,
+                            false);
+                    mHighString = dataMap.getString(HIGH_TEMP_KEY);
+                    mLowString = dataMap.getString(LOW_TEMP_KEY);
 
-                        invalidate();
-                    }
+                    //Log.v("WATCH FACE", "mHighString: " + mHighString + " mLowString: " + mLowString);
+
+                    invalidate();
                 }
             }
         }
 
         private int getResourceIdFromWeatherId(int weatherId) {
             if (weatherId >= 200 && weatherId <= 232) {
-                return com.example.android.sunshine.wear.R.drawable.art_storm;
+                return R.drawable.art_storm;
             } else if (weatherId >= 300 && weatherId <= 321) {
-                return com.example.android.sunshine.wear.R.drawable.art_light_rain;
+                return R.drawable.art_light_rain;
             } else if (weatherId >= 500 && weatherId <= 504) {
-                return com.example.android.sunshine.wear.R.drawable.art_rain;
+                return R.drawable.art_rain;
             } else if (weatherId == 511) {
-                return com.example.android.sunshine.wear.R.drawable.art_snow;
+                return R.drawable.art_snow;
             } else if (weatherId >= 520 && weatherId <= 531) {
-                return com.example.android.sunshine.wear.R.drawable.art_rain;
+                return R.drawable.art_rain;
             } else if (weatherId >= 600 && weatherId <= 622) {
-                return com.example.android.sunshine.wear.R.drawable.art_snow;
+                return R.drawable.art_snow;
             } else if (weatherId >= 701 && weatherId <= 761) {
-                return com.example.android.sunshine.wear.R.drawable.art_fog;
+                return R.drawable.art_fog;
             } else if (weatherId == 761 || weatherId == 781) {
-                return com.example.android.sunshine.wear.R.drawable.art_storm;
+                return R.drawable.art_storm;
             } else if (weatherId == 800) {
-                return com.example.android.sunshine.wear.R.drawable.art_clear;
+                return R.drawable.art_clear;
             } else if (weatherId == 801) {
-                return com.example.android.sunshine.wear.R.drawable.art_light_clouds;
+                return R.drawable.art_light_clouds;
             } else if (weatherId >= 802 && weatherId <= 804) {
-                return com.example.android.sunshine.wear.R.drawable.art_clouds;
+                return R.drawable.art_clouds;
             }
             return -1;
         }

@@ -43,13 +43,13 @@ public class SettingsActivity extends PreferenceActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Add 'general' preferences, defined in the XML file
-        addPreferencesFromResource(com.example.android.sunshine.app.R.xml.pref_general);
+        addPreferencesFromResource(R.xml.pref_general);
 
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
-        bindPreferenceSummaryToValue(findPreference(getString(com.example.android.sunshine.app.R.string.pref_location_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(com.example.android.sunshine.app.R.string.pref_units_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(com.example.android.sunshine.app.R.string.pref_art_pack_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_art_pack_key)));
     }
 
     // Registers a shared preference change listener that gets notified when preferences change
@@ -96,17 +96,17 @@ public class SettingsActivity extends PreferenceActivity
             if (prefIndex >= 0) {
                 preference.setSummary(listPreference.getEntries()[prefIndex]);
             }
-        } else if (key.equals(getString(com.example.android.sunshine.app.R.string.pref_location_key))) {
+        } else if (key.equals(getString(R.string.pref_location_key))) {
             @SunshineSyncAdapter.LocationStatus int status = Utility.getLocationStatus(this);
             switch (status) {
                 case SunshineSyncAdapter.LOCATION_STATUS_OK:
                     preference.setSummary(stringValue);
                     break;
                 case SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN:
-                    preference.setSummary(getString(com.example.android.sunshine.app.R.string.pref_location_unknown_description, value.toString()));
+                    preference.setSummary(getString(R.string.pref_location_unknown_description, value.toString()));
                     break;
                 case SunshineSyncAdapter.LOCATION_STATUS_INVALID:
-                    preference.setSummary(getString(com.example.android.sunshine.app.R.string.pref_location_error_description, value.toString()));
+                    preference.setSummary(getString(R.string.pref_location_error_description, value.toString()));
                     break;
                 default:
                     // Note --- if the server is down we still assume the value
@@ -131,19 +131,19 @@ public class SettingsActivity extends PreferenceActivity
     // start our synchronization here
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if ( key.equals(getString(com.example.android.sunshine.app.R.string.pref_location_key)) ) {
+        if ( key.equals(getString(R.string.pref_location_key)) ) {
             // we've changed the location
             // first clear locationStatus
             Utility.resetLocationStatus(this);
             SunshineSyncAdapter.syncImmediately(this);
-        } else if ( key.equals(getString(com.example.android.sunshine.app.R.string.pref_units_key)) ) {
+        } else if ( key.equals(getString(R.string.pref_units_key)) ) {
             // units have changed. update lists of weather entries accordingly
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
-        } else if ( key.equals(getString(com.example.android.sunshine.app.R.string.pref_location_status_key)) ) {
+        } else if ( key.equals(getString(R.string.pref_location_status_key)) ) {
             // our location status has changed.  Update the summary accordingly
-            Preference locationPreference = findPreference(getString(com.example.android.sunshine.app.R.string.pref_location_key));
+            Preference locationPreference = findPreference(getString(R.string.pref_location_key));
             bindPreferenceSummaryToValue(locationPreference);
-        } else if ( key.equals(getString(com.example.android.sunshine.app.R.string.pref_art_pack_key)) ) {
+        } else if ( key.equals(getString(R.string.pref_art_pack_key)) ) {
             // art pack have changed. update lists of weather entries accordingly
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         }

@@ -30,9 +30,9 @@ import android.text.format.Time;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
-import com.example.android.sunshine.app.BuildConfig;
+import com.example.android.sunshine.BuildConfig;
 import com.example.android.sunshine.MainActivity;
-import com.example.android.sunshine.app.R;
+import com.example.android.sunshine.R;
 import com.example.android.sunshine.Utility;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.muzei.WeatherMuzeiSource;

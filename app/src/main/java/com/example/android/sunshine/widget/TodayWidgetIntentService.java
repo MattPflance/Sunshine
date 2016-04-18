@@ -30,7 +30,7 @@ import android.util.TypedValue;
 import android.widget.RemoteViews;
 
 import com.example.android.sunshine.MainActivity;
-import com.example.android.sunshine.app.R;
+import com.example.android.sunshine.R;
 import com.example.android.sunshine.Utility;
 import com.example.android.sunshine.data.WeatherContract;
 

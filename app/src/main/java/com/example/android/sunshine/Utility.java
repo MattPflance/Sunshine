@@ -32,15 +32,15 @@ import java.util.Locale;
 public class Utility {
     public static String getPreferredLocation(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(com.example.android.sunshine.app.R.string.pref_location_key),
-                context.getString(com.example.android.sunshine.app.R.string.pref_location_default));
+        return prefs.getString(context.getString(R.string.pref_location_key),
+                context.getString(R.string.pref_location_default));
     }
 
     public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(context.getString(com.example.android.sunshine.app.R.string.pref_units_key),
-                context.getString(com.example.android.sunshine.app.R.string.pref_units_metric))
-                .equals(context.getString(com.example.android.sunshine.app.R.string.pref_units_metric));
+        return prefs.getString(context.getString(R.string.pref_units_key),
+                context.getString(R.string.pref_units_metric))
+                .equals(context.getString(R.string.pref_units_metric));
     }
 
     public static String formatTemperature(Context context, double temperature) {
@@ -52,7 +52,7 @@ public class Utility {
         }
 
         // For presentation, assume the user doesn't care about tenths of a degree.
-        return String.format(context.getString(com.example.android.sunshine.app.R.string.format_temperature), temperature);
+        return String.format(context.getString(R.string.format_temperature), temperature);
     }
 
     static String formatDate(long dateInMilliseconds) {
@@ -88,8 +88,8 @@ public class Utility {
         // If the date we're building the String for is today's date, the format
         // is "Today, June 24"
         if (displayLongToday && julianDay == currentJulianDay) {
-            String today = context.getString(com.example.android.sunshine.app.R.string.today);
-            int formatId = com.example.android.sunshine.app.R.string.format_full_friendly_date;
+            String today = context.getString(R.string.today);
+            int formatId = R.string.format_full_friendly_date;
             return String.format(context.getString(
                     formatId,
                     today,
@@ -115,7 +115,7 @@ public class Utility {
     public static String getFullFriendlyDayString(Context context, long dateInMillis) {
 
         String day = getDayName(context, dateInMillis);
-        int formatId = com.example.android.sunshine.app.R.string.format_full_friendly_date;
+        int formatId = R.string.format_full_friendly_date;
         return String.format(context.getString(
                 formatId,
                 day,
@@ -139,9 +139,9 @@ public class Utility {
         int julianDay = Time.getJulianDay(dateInMillis, t.gmtoff);
         int currentJulianDay = Time.getJulianDay(System.currentTimeMillis(), t.gmtoff);
         if (julianDay == currentJulianDay) {
-            return context.getString(com.example.android.sunshine.app.R.string.today);
+            return context.getString(R.string.today);
         } else if ( julianDay == currentJulianDay +1 ) {
-            return context.getString(com.example.android.sunshine.app.R.string.tomorrow);
+            return context.getString(R.string.tomorrow);
         } else {
             Time time = new Time();
             time.setToNow();
@@ -170,9 +170,9 @@ public class Utility {
     public static String getFormattedWind(Context context, float windSpeed, float degrees) {
         int windFormat;
         if (Utility.isMetric(context)) {
-            windFormat = com.example.android.sunshine.app.R.string.format_wind_kmh;
+            windFormat = R.string.format_wind_kmh;
         } else {
-            windFormat = com.example.android.sunshine.app.R.string.format_wind_mph;
+            windFormat = R.string.format_wind_mph;
             windSpeed = .621371192237334f * windSpeed;
         }
 
@@ -210,27 +210,27 @@ public class Utility {
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
         if (weatherId >= 200 && weatherId <= 232) {
-            return com.example.android.sunshine.app.R.drawable.ic_storm;
+            return R.drawable.ic_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
-            return com.example.android.sunshine.app.R.drawable.ic_light_rain;
+            return R.drawable.ic_light_rain;
         } else if (weatherId >= 500 && weatherId <= 504) {
-            return com.example.android.sunshine.app.R.drawable.ic_rain;
+            return R.drawable.ic_rain;
         } else if (weatherId == 511) {
-            return com.example.android.sunshine.app.R.drawable.ic_snow;
+            return R.drawable.ic_snow;
         } else if (weatherId >= 520 && weatherId <= 531) {
-            return com.example.android.sunshine.app.R.drawable.ic_rain;
+            return R.drawable.ic_rain;
         } else if (weatherId >= 600 && weatherId <= 622) {
-            return com.example.android.sunshine.app.R.drawable.ic_snow;
+            return R.drawable.ic_snow;
         } else if (weatherId >= 701 && weatherId <= 761) {
-            return com.example.android.sunshine.app.R.drawable.ic_fog;
+            return R.drawable.ic_fog;
         } else if (weatherId == 761 || weatherId == 781) {
-            return com.example.android.sunshine.app.R.drawable.ic_storm;
+            return R.drawable.ic_storm;
         } else if (weatherId == 800) {
-            return com.example.android.sunshine.app.R.drawable.ic_clear;
+            return R.drawable.ic_clear;
         } else if (weatherId == 801) {
-            return com.example.android.sunshine.app.R.drawable.ic_light_clouds;
+            return R.drawable.ic_light_clouds;
         } else if (weatherId >= 802 && weatherId <= 804) {
-            return com.example.android.sunshine.app.R.drawable.ic_cloudy;
+            return R.drawable.ic_cloudy;
         }
         return -1;
     }
@@ -243,8 +243,8 @@ public class Utility {
      */
     public static boolean usingLocalGraphics(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String sunshineArtPack = context.getString(com.example.android.sunshine.app.R.string.pref_art_pack_sunshine);
-        return prefs.getString(context.getString(com.example.android.sunshine.app.R.string.pref_art_pack_key),
+        String sunshineArtPack = context.getString(R.string.pref_art_pack_sunshine);
+        return prefs.getString(context.getString(R.string.pref_art_pack_key),
                 sunshineArtPack).equals(sunshineArtPack);
     }
 
@@ -258,8 +258,8 @@ public class Utility {
      */
     public static String getArtUrlForWeatherCondition(Context context, int weatherId) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String formatArtUrl = prefs.getString(context.getString(com.example.android.sunshine.app.R.string.pref_art_pack_key),
-                context.getString(com.example.android.sunshine.app.R.string.pref_art_pack_sunshine));
+        String formatArtUrl = prefs.getString(context.getString(R.string.pref_art_pack_key),
+                context.getString(R.string.pref_art_pack_sunshine));
 
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
@@ -299,27 +299,27 @@ public class Utility {
         // Based on weather code data found at:
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
         if (weatherId >= 200 && weatherId <= 232) {
-            return com.example.android.sunshine.app.R.drawable.art_storm;
+            return R.drawable.art_storm;
         } else if (weatherId >= 300 && weatherId <= 321) {
-            return com.example.android.sunshine.app.R.drawable.art_light_rain;
+            return R.drawable.art_light_rain;
         } else if (weatherId >= 500 && weatherId <= 504) {
-            return com.example.android.sunshine.app.R.drawable.art_rain;
+            return R.drawable.art_rain;
         } else if (weatherId == 511) {
-            return com.example.android.sunshine.app.R.drawable.art_snow;
+            return R.drawable.art_snow;
         } else if (weatherId >= 520 && weatherId <= 531) {
-            return com.example.android.sunshine.app.R.drawable.art_rain;
+            return R.drawable.art_rain;
         } else if (weatherId >= 600 && weatherId <= 622) {
-            return com.example.android.sunshine.app.R.drawable.art_snow;
+            return R.drawable.art_snow;
         } else if (weatherId >= 701 && weatherId <= 761) {
-            return com.example.android.sunshine.app.R.drawable.art_fog;
+            return R.drawable.art_fog;
         } else if (weatherId == 761 || weatherId == 781) {
-            return com.example.android.sunshine.app.R.drawable.art_storm;
+            return R.drawable.art_storm;
         } else if (weatherId == 800) {
-            return com.example.android.sunshine.app.R.drawable.art_clear;
+            return R.drawable.art_clear;
         } else if (weatherId == 801) {
-            return com.example.android.sunshine.app.R.drawable.art_light_clouds;
+            return R.drawable.art_light_clouds;
         } else if (weatherId >= 802 && weatherId <= 804) {
-            return com.example.android.sunshine.app.R.drawable.art_clouds;
+            return R.drawable.art_clouds;
         }
         return -1;
     }
@@ -336,168 +336,168 @@ public class Utility {
         // http://bugs.openweathermap.org/projects/api/wiki/Weather_Condition_Codes
         int stringId;
         if (weatherId >= 200 && weatherId <= 232) {
-            stringId = com.example.android.sunshine.app.R.string.condition_2xx;
+            stringId = R.string.condition_2xx;
         } else if (weatherId >= 300 && weatherId <= 321) {
-            stringId = com.example.android.sunshine.app.R.string.condition_3xx;
+            stringId = R.string.condition_3xx;
         } else switch (weatherId) {
             case 500:
-                stringId = com.example.android.sunshine.app.R.string.condition_500;
+                stringId = R.string.condition_500;
                 break;
             case 501:
-                stringId = com.example.android.sunshine.app.R.string.condition_501;
+                stringId = R.string.condition_501;
                 break;
             case 502:
-                stringId = com.example.android.sunshine.app.R.string.condition_502;
+                stringId = R.string.condition_502;
                 break;
             case 503:
-                stringId = com.example.android.sunshine.app.R.string.condition_503;
+                stringId = R.string.condition_503;
                 break;
             case 504:
-                stringId = com.example.android.sunshine.app.R.string.condition_504;
+                stringId = R.string.condition_504;
                 break;
             case 511:
-                stringId = com.example.android.sunshine.app.R.string.condition_511;
+                stringId = R.string.condition_511;
                 break;
             case 520:
-                stringId = com.example.android.sunshine.app.R.string.condition_520;
+                stringId = R.string.condition_520;
                 break;
             case 531:
-                stringId = com.example.android.sunshine.app.R.string.condition_531;
+                stringId = R.string.condition_531;
                 break;
             case 600:
-                stringId = com.example.android.sunshine.app.R.string.condition_600;
+                stringId = R.string.condition_600;
                 break;
             case 601:
-                stringId = com.example.android.sunshine.app.R.string.condition_601;
+                stringId = R.string.condition_601;
                 break;
             case 602:
-                stringId = com.example.android.sunshine.app.R.string.condition_602;
+                stringId = R.string.condition_602;
                 break;
             case 611:
-                stringId = com.example.android.sunshine.app.R.string.condition_611;
+                stringId = R.string.condition_611;
                 break;
             case 612:
-                stringId = com.example.android.sunshine.app.R.string.condition_612;
+                stringId = R.string.condition_612;
                 break;
             case 615:
-                stringId = com.example.android.sunshine.app.R.string.condition_615;
+                stringId = R.string.condition_615;
                 break;
             case 616:
-                stringId = com.example.android.sunshine.app.R.string.condition_616;
+                stringId = R.string.condition_616;
                 break;
             case 620:
-                stringId = com.example.android.sunshine.app.R.string.condition_620;
+                stringId = R.string.condition_620;
                 break;
             case 621:
-                stringId = com.example.android.sunshine.app.R.string.condition_621;
+                stringId = R.string.condition_621;
                 break;
             case 622:
-                stringId = com.example.android.sunshine.app.R.string.condition_622;
+                stringId = R.string.condition_622;
                 break;
             case 701:
-                stringId = com.example.android.sunshine.app.R.string.condition_701;
+                stringId = R.string.condition_701;
                 break;
             case 711:
-                stringId = com.example.android.sunshine.app.R.string.condition_711;
+                stringId = R.string.condition_711;
                 break;
             case 721:
-                stringId = com.example.android.sunshine.app.R.string.condition_721;
+                stringId = R.string.condition_721;
                 break;
             case 731:
-                stringId = com.example.android.sunshine.app.R.string.condition_731;
+                stringId = R.string.condition_731;
                 break;
             case 741:
-                stringId = com.example.android.sunshine.app.R.string.condition_741;
+                stringId = R.string.condition_741;
                 break;
             case 751:
-                stringId = com.example.android.sunshine.app.R.string.condition_751;
+                stringId = R.string.condition_751;
                 break;
             case 761:
-                stringId = com.example.android.sunshine.app.R.string.condition_761;
+                stringId = R.string.condition_761;
                 break;
             case 762:
-                stringId = com.example.android.sunshine.app.R.string.condition_762;
+                stringId = R.string.condition_762;
                 break;
             case 771:
-                stringId = com.example.android.sunshine.app.R.string.condition_771;
+                stringId = R.string.condition_771;
                 break;
             case 781:
-                stringId = com.example.android.sunshine.app.R.string.condition_781;
+                stringId = R.string.condition_781;
                 break;
             case 800:
-                stringId = com.example.android.sunshine.app.R.string.condition_800;
+                stringId = R.string.condition_800;
                 break;
             case 801:
-                stringId = com.example.android.sunshine.app.R.string.condition_801;
+                stringId = R.string.condition_801;
                 break;
             case 802:
-                stringId = com.example.android.sunshine.app.R.string.condition_802;
+                stringId = R.string.condition_802;
                 break;
             case 803:
-                stringId = com.example.android.sunshine.app.R.string.condition_803;
+                stringId = R.string.condition_803;
                 break;
             case 804:
-                stringId = com.example.android.sunshine.app.R.string.condition_804;
+                stringId = R.string.condition_804;
                 break;
             case 900:
-                stringId = com.example.android.sunshine.app.R.string.condition_900;
+                stringId = R.string.condition_900;
                 break;
             case 901:
-                stringId = com.example.android.sunshine.app.R.string.condition_901;
+                stringId = R.string.condition_901;
                 break;
             case 902:
-                stringId = com.example.android.sunshine.app.R.string.condition_902;
+                stringId = R.string.condition_902;
                 break;
             case 903:
-                stringId = com.example.android.sunshine.app.R.string.condition_903;
+                stringId = R.string.condition_903;
                 break;
             case 904:
-                stringId = com.example.android.sunshine.app.R.string.condition_904;
+                stringId = R.string.condition_904;
                 break;
             case 905:
-                stringId = com.example.android.sunshine.app.R.string.condition_905;
+                stringId = R.string.condition_905;
                 break;
             case 906:
-                stringId = com.example.android.sunshine.app.R.string.condition_906;
+                stringId = R.string.condition_906;
                 break;
             case 951:
-                stringId = com.example.android.sunshine.app.R.string.condition_951;
+                stringId = R.string.condition_951;
                 break;
             case 952:
-                stringId = com.example.android.sunshine.app.R.string.condition_952;
+                stringId = R.string.condition_952;
                 break;
             case 953:
-                stringId = com.example.android.sunshine.app.R.string.condition_953;
+                stringId = R.string.condition_953;
                 break;
             case 954:
-                stringId = com.example.android.sunshine.app.R.string.condition_954;
+                stringId = R.string.condition_954;
                 break;
             case 955:
-                stringId = com.example.android.sunshine.app.R.string.condition_955;
+                stringId = R.string.condition_955;
                 break;
             case 956:
-                stringId = com.example.android.sunshine.app.R.string.condition_956;
+                stringId = R.string.condition_956;
                 break;
             case 957:
-                stringId = com.example.android.sunshine.app.R.string.condition_957;
+                stringId = R.string.condition_957;
                 break;
             case 958:
-                stringId = com.example.android.sunshine.app.R.string.condition_958;
+                stringId = R.string.condition_958;
                 break;
             case 959:
-                stringId = com.example.android.sunshine.app.R.string.condition_959;
+                stringId = R.string.condition_959;
                 break;
             case 960:
-                stringId = com.example.android.sunshine.app.R.string.condition_960;
+                stringId = R.string.condition_960;
                 break;
             case 961:
-                stringId = com.example.android.sunshine.app.R.string.condition_961;
+                stringId = R.string.condition_961;
                 break;
             case 962:
-                stringId = com.example.android.sunshine.app.R.string.condition_962;
+                stringId = R.string.condition_962;
                 break;
             default:
-                return context.getString(com.example.android.sunshine.app.R.string.condition_unknown, weatherId);
+                return context.getString(R.string.condition_unknown, weatherId);
         }
         return context.getString(stringId);
     }
@@ -562,7 +562,7 @@ public class Utility {
     static public @SunshineSyncAdapter.LocationStatus
     int getLocationStatus(Context c){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-        return sp.getInt(c.getString(com.example.android.sunshine.app.R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+        return sp.getInt(c.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
 
     /**
@@ -572,7 +572,7 @@ public class Utility {
     static public void resetLocationStatus(Context c){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor spe = sp.edit();
-        spe.putInt(c.getString(com.example.android.sunshine.app.R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
+        spe.putInt(c.getString(R.string.pref_location_status_key), SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
         spe.apply();
     }
 }

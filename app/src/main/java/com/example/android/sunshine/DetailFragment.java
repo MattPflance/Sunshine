@@ -112,24 +112,24 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mTransitionAnimation = arguments.getBoolean(DetailFragment.DETAIL_TRANSITION_ANIMATION, false);
         }
 
-        View rootView = inflater.inflate(com.example.android.sunshine.app.R.layout.fragment_detail_start, container, false);
-        mIconView = (ImageView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_icon);
-        mDateView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_date_textview);
-        mDescriptionView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_forecast_textview);
-        mHighTempView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_high_textview);
-        mLowTempView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_low_textview);
-        mHumidityView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_humidity_textview);
-        mHumidityLabelView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_humidity_label_textview);
-        mWindView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_wind_textview);
-        mWindLabelView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_wind_label_textview);
-        mPressureView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_pressure_textview);
-        mPressureLabelView = (TextView) rootView.findViewById(com.example.android.sunshine.app.R.id.detail_pressure_label_textview);
+        View rootView = inflater.inflate(R.layout.fragment_detail_start, container, false);
+        mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
+        mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
+        mDescriptionView = (TextView) rootView.findViewById(R.id.detail_forecast_textview);
+        mHighTempView = (TextView) rootView.findViewById(R.id.detail_high_textview);
+        mLowTempView = (TextView) rootView.findViewById(R.id.detail_low_textview);
+        mHumidityView = (TextView) rootView.findViewById(R.id.detail_humidity_textview);
+        mHumidityLabelView = (TextView) rootView.findViewById(R.id.detail_humidity_label_textview);
+        mWindView = (TextView) rootView.findViewById(R.id.detail_wind_textview);
+        mWindLabelView = (TextView) rootView.findViewById(R.id.detail_wind_label_textview);
+        mPressureView = (TextView) rootView.findViewById(R.id.detail_pressure_textview);
+        mPressureLabelView = (TextView) rootView.findViewById(R.id.detail_pressure_label_textview);
         return rootView;
     }
 
     private void finishCreatingMenu(Menu menu) {
         // Retrieve the share menu item
-        MenuItem menuItem = menu.findItem(com.example.android.sunshine.app.R.id.action_share);
+        MenuItem menuItem = menu.findItem(R.id.action_share);
         menuItem.setIntent(createShareForecastIntent());
     }
 
@@ -137,7 +137,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if ( getActivity() instanceof DetailActivity ){
             // Inflate the menu; this adds items to the action bar if it is present.
-            inflater.inflate(com.example.android.sunshine.app.R.menu.detailfragment, menu);
+            inflater.inflate(R.menu.detailfragment, menu);
             finishCreatingMenu(menu);
         }
     }
@@ -218,13 +218,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // Get description from weather condition ID
             String description = Utility.getStringForWeatherCondition(getActivity(), weatherId);
             mDescriptionView.setText(description);
-            mDescriptionView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_forecast, description));
+            mDescriptionView.setContentDescription(getString(R.string.a11y_forecast, description));
 
             // For accessibility, add a content description to the icon field. Because the ImageView
             // is independently focusable, it's better to have a description of the image. Using
             // null is appropriate when the image is purely decorative or when the image already
             // has text describing it in the same UI component.
-            mIconView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_forecast_icon, description));
+            mIconView.setContentDescription(getString(R.string.a11y_forecast_icon, description));
 
             // Read high temperature from cursor and update view
             boolean isMetric = Utility.isMetric(getActivity());
@@ -232,31 +232,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             double high = data.getDouble(COL_WEATHER_MAX_TEMP);
             String highString = Utility.formatTemperature(getActivity(), high);
             mHighTempView.setText(highString);
-            mHighTempView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_high_temp, highString));
+            mHighTempView.setContentDescription(getString(R.string.a11y_high_temp, highString));
 
             // Read low temperature from cursor and update view
             double low = data.getDouble(COL_WEATHER_MIN_TEMP);
             String lowString = Utility.formatTemperature(getActivity(), low);
             mLowTempView.setText(lowString);
-            mLowTempView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_low_temp, lowString));
+            mLowTempView.setContentDescription(getString(R.string.a11y_low_temp, lowString));
 
             // Read humidity from cursor and update view
             float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
-            mHumidityView.setText(getActivity().getString(com.example.android.sunshine.app.R.string.format_humidity, humidity));
-            mHumidityView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_humidity, mHumidityView.getText()));
+            mHumidityView.setText(getActivity().getString(R.string.format_humidity, humidity));
+            mHumidityView.setContentDescription(getString(R.string.a11y_humidity, mHumidityView.getText()));
             mHumidityLabelView.setContentDescription(mHumidityView.getContentDescription());
 
             // Read wind speed and direction from cursor and update view
             float windSpeedStr = data.getFloat(COL_WEATHER_WIND_SPEED);
             float windDirStr = data.getFloat(COL_WEATHER_DEGREES);
             mWindView.setText(Utility.getFormattedWind(getActivity(), windSpeedStr, windDirStr));
-            mWindView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_wind, mWindView.getText()));
+            mWindView.setContentDescription(getString(R.string.a11y_wind, mWindView.getText()));
             mWindLabelView.setContentDescription(mWindView.getContentDescription());
 
             // Read pressure from cursor and update view
             float pressure = data.getFloat(COL_WEATHER_PRESSURE);
-            mPressureView.setText(getString(com.example.android.sunshine.app.R.string.format_pressure, pressure));
-            mPressureView.setContentDescription(getString(com.example.android.sunshine.app.R.string.a11y_pressure, mPressureView.getText()));
+            mPressureView.setText(getString(R.string.format_pressure, pressure));
+            mPressureView.setContentDescription(getString(R.string.a11y_pressure, mPressureView.getText()));
             mPressureLabelView.setContentDescription(mPressureView.getContentDescription());
 
             // We still need this for the share intent
@@ -264,7 +264,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         }
         AppCompatActivity activity = (AppCompatActivity)getActivity();
-        Toolbar toolbarView = (Toolbar) getView().findViewById(com.example.android.sunshine.app.R.id.toolbar);
+        Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 
         // We need to start the enter transition after the data has loaded
         if ( mTransitionAnimation ) {
@@ -280,7 +280,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             if ( null != toolbarView ) {
                 Menu menu = toolbarView.getMenu();
                 if ( null != menu ) menu.clear();
-                toolbarView.inflateMenu(com.example.android.sunshine.app.R.menu.detailfragment);
+                toolbarView.inflateMenu(R.menu.detailfragment);
                 finishCreatingMenu(toolbarView.getMenu());
             }
         }

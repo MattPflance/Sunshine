@@ -39,15 +39,18 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 public class MainActivity extends AppCompatActivity implements
         ForecastFragment.Callback,
-        MessageApi.MessageListener,
+        DataApi.DataListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -84,12 +87,12 @@ public class MainActivity extends AppCompatActivity implements
         mLocation = Utility.getPreferredLocation(this);
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 
-        setContentView(com.example.android.sunshine.app.R.layout.activity_main);
-        Toolbar toolbar = (Toolbar)findViewById(com.example.android.sunshine.app.R.id.toolbar);
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        if (findViewById(com.example.android.sunshine.app.R.id.weather_detail_container) != null) {
+        if (findViewById(R.id.weather_detail_container) != null) {
             // The detail container view will be present only in the large-screen layouts
             // (res/layout-sw600dp). If this view is present, then the activity should be
             // in two-pane mode.
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements
                     fragment.setArguments(args);
                 }
                 getSupportFragmentManager().beginTransaction()
-                        .replace(com.example.android.sunshine.app.R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                        .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
                         .commit();
             }
         } else {
@@ -114,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         ForecastFragment forecastFragment =  ((ForecastFragment)getSupportFragmentManager()
-                .findFragmentById(com.example.android.sunshine.app.R.id.fragment_forecast));
+                .findFragmentById(R.id.fragment_forecast));
         forecastFragment.setUseTodayLayout(!mTwoPane);
         if (contentUri != null) {
             forecastFragment.setInitialSelectedDate(
@@ -150,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(com.example.android.sunshine.app.R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -162,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == com.example.android.sunshine.app.R.id.action_settings) {
+        if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onStop() {
         super.onStop();
         if (mGoogleApiClient.isConnected()) {
-            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+            Wearable.DataApi.removeListener(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
     }
@@ -191,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements
         String location = Utility.getPreferredLocation( this );
         // update the location in our second pane using the fragment manager
             if (location != null && !location.equals(mLocation)) {
-            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(com.example.android.sunshine.app.R.id.fragment_forecast);
+            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
             if ( null != ff ) {
                 ff.onLocationChanged();
             }
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(com.example.android.sunshine.app.R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
                     .commit();
         } else {
             Intent intent = new Intent(this, DetailActivity.class)
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements
 
             ActivityOptionsCompat activityOptions =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                            new Pair<View, String>(vh.mIconView, getString(com.example.android.sunshine.app.R.string.detail_icon_transition_name)));
+                            new Pair<View, String>(vh.mIconView, getString(R.string.detail_icon_transition_name)));
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }
@@ -253,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         Log.i(LOG_TAG, "GoogleApiClient connected!");
-        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -264,53 +267,56 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Log.e(LOG_TAG, "GoogleApiClient Connection Failed with result " + connectionResult);
-        Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
     }
 
     @Override
-    public void onMessageReceived(MessageEvent messageEvent) {
-        Log.i(LOG_TAG, "On Data Changed actually got something!!!");
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        for (DataEvent event : dataEvents) {
+            String path = event.getDataItem().getUri().getPath();
+            if (path.equals(WEATHER_REQUEST_PATH)) {
+                //Log.i(LOG_TAG, "Path is all good");
+                // Get the cursor
+                Cursor cursor = getContentResolver().query(
+                        WeatherContract.WeatherEntry.CONTENT_URI,
+                        mWearableProjection,
+                        null,
+                        null,
+                        null);
 
-        // Send the data to the wearable
-
-        if (messageEvent.getPath().equals(WEATHER_REQUEST_PATH)) {
-            // Get the cursor
-            Cursor cursor = getContentResolver().query(
-                    WeatherContract.WeatherEntry.CONTENT_URI,
-                    mWearableProjection,
-                    null,
-                    null,
-                    null);
-
-            if (cursor == null) {
-                Log.e(LOG_TAG, "Cursor is null.");
-                return;
-            }
-
-            // Move to today's date
-            double high = 0;
-            double low = 0;
-            int weatherId = 0;
-            if (cursor.moveToFirst()) {
-                high = cursor.getDouble(COL_WEATHER_MAX_TEMP);
-                low = cursor.getDouble(COL_WEATHER_MIN_TEMP);
-                weatherId = cursor.getInt(COL_WEATHER_ID);
-            }
-
-            // Add our data for the wearable
-            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_PATH);
-            putDataMapRequest.getDataMap().putInt(WEATHER_ID_KEY, weatherId);
-            putDataMapRequest.getDataMap().putString(HIGH_TEMP_KEY, Utility.formatTemperature(this, high));
-            putDataMapRequest.getDataMap().putString(LOW_TEMP_KEY, Utility.formatTemperature(this, low));
-
-            // Now send the request
-            PutDataRequest request = putDataMapRequest.asPutDataRequest();
-            Wearable.DataApi.putDataItem(mGoogleApiClient, request).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                @Override
-                public void onResult(final DataApi.DataItemResult result) {
-                    Log.d(LOG_TAG, "Data item status: " + result.getStatus());
+                if (cursor == null) {
+                    //Log.e(LOG_TAG, "Cursor is null.");
+                    return;
                 }
-            });
+
+                // Move to today's date
+                double high = 0;
+                double low = 0;
+                int weatherId = 0;
+                if (cursor.moveToFirst()) {
+                    high = cursor.getDouble(COL_WEATHER_MAX_TEMP);
+                    low = cursor.getDouble(COL_WEATHER_MIN_TEMP);
+                    weatherId = cursor.getInt(COL_WEATHER_ID);
+                    //Log.i(LOG_TAG, "Cursor moved to first, all good!");
+                }
+
+                // Add our data for the wearable
+                PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_PATH);
+                putDataMapRequest.getDataMap().putLong("Time", System.currentTimeMillis());
+                putDataMapRequest.getDataMap().putInt(WEATHER_ID_KEY, weatherId);
+                putDataMapRequest.getDataMap().putString(HIGH_TEMP_KEY, Utility.formatTemperature(this, high));
+                putDataMapRequest.getDataMap().putString(LOW_TEMP_KEY, Utility.formatTemperature(this, low));
+                putDataMapRequest.setUrgent();
+
+                // Now send the request
+                PutDataRequest request = putDataMapRequest.asPutDataRequest();
+                Wearable.DataApi.putDataItem(mGoogleApiClient, request).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
+                    @Override
+                    public void onResult(final DataApi.DataItemResult result) {
+                        //Log.d(LOG_TAG, "Data item status: " + result.getStatus());
+                    }
+                });
+            }
         }
     }
 }

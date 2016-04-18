@@ -24,7 +24,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(com.example.android.sunshine.app.R.layout.activity_detail);
+        setContentView(R.layout.activity_detail);
 
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
@@ -38,7 +38,7 @@ public class DetailActivity extends AppCompatActivity {
             fragment.setArguments(arguments);
 
             getSupportFragmentManager().beginTransaction()
-                    .add(com.example.android.sunshine.app.R.id.weather_detail_container, fragment)
+                    .add(R.id.weather_detail_container, fragment)
                     .commit();
 
             // Being here means we are in animation mode

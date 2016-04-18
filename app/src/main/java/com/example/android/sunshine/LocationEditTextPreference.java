@@ -35,10 +35,10 @@ public class LocationEditTextPreference extends EditTextPreference {
         super(context, attrs);
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                com.example.android.sunshine.app.R.styleable.LocationEditTextPreference,
+                R.styleable.LocationEditTextPreference,
                 0, 0);
         try {
-            mMinLength = a.getInteger(com.example.android.sunshine.app.R.styleable.LocationEditTextPreference_minLength, DEFAULT_MINIMUM_LOCATION_LENGTH);
+            mMinLength = a.getInteger(R.styleable.LocationEditTextPreference_minLength, DEFAULT_MINIMUM_LOCATION_LENGTH);
         } finally {
             a.recycle();
         }
