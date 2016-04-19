@@ -127,6 +127,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         private Paint mDividerPaint;
         private Paint mHighTempPaint;
         private Paint mLowTempPaint;
+        private Paint mWhiteBorderPaint;
+        private Paint mBlueBorderPaint;
         private Bitmap mWeatherBitmap;
 
         private GregorianCalendar mCalendar;
@@ -277,7 +279,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             super.onAmbientModeChanged(inAmbientMode);
 
             // Adjust colors to ambient or interactive mode
-
+            // No need to do this since colors are supported
 
             // Turn off AntiAliasing in Low Bit Ambient mode
             if (mLowBitAmbient) {
@@ -288,6 +290,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 mMinutePaint.setAntiAlias(antiAliasStatus);
                 mAmPmPaint.setAntiAlias(antiAliasStatus);
                 mDatePaint.setAntiAlias(antiAliasStatus);
+                mDividerPaint.setAntiAlias(antiAliasStatus);
                 mHighTempPaint.setAntiAlias(antiAliasStatus);
                 mLowTempPaint.setAntiAlias(antiAliasStatus);
             }
