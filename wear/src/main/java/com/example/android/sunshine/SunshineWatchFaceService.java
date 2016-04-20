@@ -217,8 +217,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                     .build());
 
             // Initialize resources
-            Resources resources = SunshineWatchFaceService.this.getResources();
-            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
             mDividerSize = 1f;
             mAmString = "AM";
             mPmString = "PM";
@@ -473,6 +471,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             Resources resources = SunshineWatchFaceService.this.getResources();
             boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+            mYOffset = resources.getDimension(isRound ? R.dimen.digital_y_offset_round : R.dimen.digital_y_offset);
             mDividerSize = isRound ? 1f : 2f;
             float timeTextSize = resources.getDimension(isRound ? R.dimen.time_text_size_round : R.dimen.time_text_size);
             float dateTextSize = resources.getDimension(R.dimen.date_text_size);
