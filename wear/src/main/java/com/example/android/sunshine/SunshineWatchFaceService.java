@@ -89,7 +89,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
     // Update twice a second to blink colons
     private static final long INTERACTIVE_UPDATE_RATE_MS = 500;
-    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final long HOUR_IN_MILLIS = 1000 * 60 * 60;
 
     /**
      * Handler message id for updating the time periodically in interactive mode.
@@ -127,8 +127,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         private Paint mDividerPaint;
         private Paint mHighTempPaint;
         private Paint mLowTempPaint;
-        private Paint mWhiteBorderPaint;
-        private Paint mBlueBorderPaint;
         private Bitmap mWeatherBitmap;
 
         private GregorianCalendar mCalendar;
@@ -166,7 +164,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 switch (message.what) {
                     case MSG_UPDATE_WEATHER:
                         long timeMs = System.currentTimeMillis();
-                        long delayMs = DAY_IN_MILLIS - (timeMs % DAY_IN_MILLIS);
+                        long delayMs = HOUR_IN_MILLIS - (timeMs % HOUR_IN_MILLIS);
 
                         //Log.v("WATCH FACE", "Delay: " + delayMs);
 
@@ -250,9 +248,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             mDividerPaint.setStrokeWidth(mDividerSize);
             mDividerPaint.setColor(ContextCompat.getColor(context, R.color.primary_light));
             mHighTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.white), NORMAL_TYPEFACE);
-            mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.forecast_low_text), NORMAL_TYPEFACE);
-
-            //mWeatherBitmap;          // Colored or Gray icon
+            mLowTempPaint = createTextPaint(ContextCompat.getColor(context, R.color.primary_light), NORMAL_TYPEFACE);
 
             mCalendar = new GregorianCalendar();
             mCalendar.setTimeInMillis(System.currentTimeMillis());
@@ -293,12 +289,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 mDividerPaint.setAntiAlias(antiAliasStatus);
                 mHighTempPaint.setAntiAlias(antiAliasStatus);
                 mLowTempPaint.setAntiAlias(antiAliasStatus);
-            }
-
-            // Remove blocks of white text for burn-in protection
-            if (mBurnInProtection) {
-                boolean antiAliasStatus = !inAmbientMode;
-
             }
 
             invalidate();
@@ -360,6 +350,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
             // Center the text
             float x = centerX - (textWidth / 2);
+            float y = mYOffset;
 
             // Draw text centered
             canvas.drawText(hourString, x, mYOffset, mHourPaint);
@@ -377,36 +368,29 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             }
 
             /* DATE */
+            if (!mBurnInProtection || !isAmbient) {
+                String date = getDayOfWeek(mCalendar.get(Calendar.DAY_OF_WEEK)) + ", " +
+                        getMonth(mCalendar.get(Calendar.MONTH)) + " " +
+                        mCalendar.get(Calendar.DAY_OF_MONTH) + " " +
+                        mCalendar.get(Calendar.YEAR);
+                date = date.toUpperCase();
 
-            String date = getDayOfWeek(mCalendar.get(Calendar.DAY_OF_WEEK)) + ", " +
-                    getMonth(mCalendar.get(Calendar.MONTH)) + " " +
-                    mCalendar.get(Calendar.DAY_OF_MONTH) + " " +
-                    mCalendar.get(Calendar.YEAR);
-            date = date.toUpperCase();
+                x = centerX - (mDatePaint.measureText(date) / 2);
+                y += mColonPaint.getTextSize();
 
-            float y = mYOffset;
-            x = centerX - (mDatePaint.measureText(date) / 2);
-            y += mColonPaint.getTextSize();
-
-            canvas.drawText(date, x, y, mDatePaint);
+                canvas.drawText(date, x, y, mDatePaint);
+            }
 
             /* Divider */
+            if (!mBurnInProtection || !isAmbient) {
+                y += mDatePaint.getTextSize();
+                x = centerX - (mColonWidth * 2);
 
-            y += mDatePaint.getTextSize();
-            x = centerX - (mColonWidth*2);
-
-            canvas.drawLine(x, y, x + (mColonWidth*4), y, mDividerPaint);
+                canvas.drawLine(x, y, x + (mColonWidth * 4), y, mDividerPaint);
+            }
 
             /* Weather */
-//            mWeatherBitmap = Bitmap.createScaledBitmap(
-//                    BitmapFactory.decodeResource(getResources(), R.drawable.art_clear),
-//                    WEATHER_BITMAP_WIDTH,
-//                    WEATHER_BITMAP_HEIGHT,
-//                    false);
-//            mHighString = "99\u00B0";
-//            mLowString = "-99\u00B0";
-
-            if (mWeatherBitmap != null && mHighString != null && mLowString != null) {
+            if ((!mBurnInProtection || !isAmbient) && mWeatherBitmap != null && mHighString != null && mLowString != null) {
 
                 y += mDatePaint.getTextSize()*2;
                 float highTempWidth = mHighTempPaint.measureText(mHighString);
