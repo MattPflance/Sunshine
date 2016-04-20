@@ -1,7 +1,7 @@
 Advanced Android Sample App
 ===================================
 
-Synchronizes weather information from OpenWeatherMap on Android Phones and Tablets. Used in the Udacity Advanced Android course.
+Synchronizes weather information from OpenWeatherMap on Android Phones and Tablets. Used in the Udacity Advanced Android course. Android weat Watch Face available that shows weather today's weather and date.
 
 Pre-requisites
 --------------
@@ -21,6 +21,8 @@ Getting Started
 ---------------
 This sample uses the Gradle build system.  To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
+
+Install both the app and wear modules for the appropriate device.
 
 Support
 -------
