@@ -164,20 +164,13 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 switch (message.what) {
                     case MSG_UPDATE_WEATHER:
                         long timeMs = System.currentTimeMillis();
-                        long delayMs = HOUR_IN_MILLIS - (timeMs % HOUR_IN_MILLIS);
-
-                        //Log.v("WATCH FACE", "Delay: " + delayMs);
+                        long delayMs = HOUR_IN_MILLIS - (timeMs % HOUR_IN_MILLIS); // Refresh weather data every hour
 
                         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(WEATHER_REQUEST_PATH);
                         putDataMapRequest.getDataMap().putLong("Time", timeMs);
                         putDataMapRequest.setUrgent();
                         PutDataRequest request = putDataMapRequest.asPutDataRequest();
-                        Wearable.DataApi.putDataItem(mGoogleApiClient, request).setResultCallback(new ResultCallback<DataApi.DataItemResult>() {
-                            @Override
-                            public void onResult(final DataApi.DataItemResult result) {
-                                //Log.d("WATCH_FACE", "Data item status: " + result.getStatus());
-                            }
-                        });
+                        Wearable.DataApi.putDataItem(mGoogleApiClient, request);
                         mUpdateWeatherHandler.sendEmptyMessageDelayed(MSG_UPDATE_WEATHER, delayMs);
                         break;
                 }
